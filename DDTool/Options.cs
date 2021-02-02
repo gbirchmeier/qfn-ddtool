@@ -39,7 +39,6 @@ namespace DDTool
                             errors.Add($"Unrecognized option: {next}");
                         else
                         {
-Console.WriteLine($">> time to append shit: {next}");
                             // All done with cmd line options now,
                             //   the rest are files.
                             DDFiles.Add(next);
@@ -50,9 +49,6 @@ Console.WriteLine($">> time to append shit: {next}");
                         break;
                 }
             }
-
-Console.WriteLine($">> count: {DDFiles.Count}");
- 
 
             if (errors.Count > 0)
             {

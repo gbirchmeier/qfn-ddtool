@@ -11,6 +11,13 @@ namespace DDTool.Structures
         public string ServicePack { get; set; }
         public bool IsFIXT { get; set; } = false;
 
+        private Dictionary<int, DDField> _fieldsByTag = new Dictionary<int, DDField>();
+
+        /// <summary>
+        /// A combination of type/Major/Minor/SP.
+        /// This is NOT the FIX BeginString.
+        /// </summary>
+        /// <value></value>
         public string Identifier
         {
             get
@@ -19,6 +26,11 @@ namespace DDTool.Structures
                 var svcPack = string.IsNullOrWhiteSpace(ServicePack) ? "" : $"SP{ServicePack}";
                 return $"{prefix}.{MajorVersion}.{MinorVersion}{svcPack}";
             }
+        }
+
+        public void AddField(DDField fld)
+        {
+            _fieldsByTag[fld.Tag] = fld;
         }
     }
 }

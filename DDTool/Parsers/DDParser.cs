@@ -22,8 +22,8 @@ namespace DDTool.Parsers
                 doc.Load(reader);
 
                 SetVersionInfo(doc, dd);
+                ParseFields(doc, dd);
                 /*
-                ParseFields(RootDoc);
                 ParseMessages(RootDoc);
                 ParseHeader(RootDoc);
                 ParseTrailer(RootDoc)
@@ -33,7 +33,7 @@ namespace DDTool.Parsers
             return dd;
         }
 
-        private static void SetVersionInfo(XmlDocument doc, DataDictionary dd)
+        public static void SetVersionInfo(XmlDocument doc, DataDictionary dd)
         {
             dd.MajorVersion = doc.SelectSingleNode("/fix/@major").Value;
             dd.MinorVersion = doc.SelectSingleNode("/fix/@minor").Value;
@@ -49,8 +49,37 @@ namespace DDTool.Parsers
             }
 
             node = doc.SelectSingleNode("/fix/@servicepack");
-            if (node != null && dd.MajorVersion=="5" && !string.IsNullOrWhiteSpace(node.Value))
+            if (node != null && !string.IsNullOrWhiteSpace(node.Value))
                 dd.ServicePack = node.Value;
+        }
+
+        private static void ParseFields(XmlDocument doc, DataDictionary dd)
+        {
+            XmlNodeList nodeList = doc.SelectNodes("//fields/field");
+            foreach (XmlNode fldEl in nodeList)
+            {
+                dd.AddField(CreateField(fldEl));
+            }
+        }
+
+        private static DDField CreateField(XmlNode fldEl)
+        {
+            String tagstr = fldEl.Attributes["number"].Value;
+            String name = fldEl.Attributes["name"].Value;
+            String fldType = fldEl.Attributes["type"].Value;
+            int tag = int.Parse(tagstr);
+            Dictionary<String, String> enums = new Dictionary<String, String>();
+            if (fldEl.HasChildNodes)
+            {
+                foreach (XmlNode enumEl in fldEl.SelectNodes(".//value"))
+                {
+                    string description = String.Empty;
+                    if (enumEl.Attributes["description"] != null)
+                        description = enumEl.Attributes["description"].Value;
+                    enums[enumEl.Attributes["enum"].Value] = description;
+                }
+            }
+            return new DDField(tag, name, enums, fldType);
         }
     }
 }
