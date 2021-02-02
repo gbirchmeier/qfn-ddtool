@@ -10,7 +10,8 @@ namespace DDTool.Structures
         public string ServicePack { get; set; }
         public bool IsFIXT { get; set; } = false;
 
-        private Dictionary<int, DDField> _fieldsByTag = new Dictionary<int, DDField>();
+        public Dictionary<int, DDField> FieldsByTag = new Dictionary<int, DDField>();
+        public Dictionary<string, DDMessage> Messages = new Dictionary<string, DDMessage>();
 
         /// <summary>
         /// A combination of type/Major/Minor/SP.
@@ -29,17 +30,16 @@ namespace DDTool.Structures
 
         public void AddField(DDField fld)
         {
-            _fieldsByTag[fld.Tag] = fld;
+            if (FieldsByTag.ContainsKey(fld.Tag))
+                throw new ApplicationException($"dupe field tag: {fld.Tag}");
+            FieldsByTag[fld.Tag] = fld;
         }
 
-        public bool HasField(int tag)
+        public void AddMessage(DDMessage msg)
         {
-            return _fieldsByTag.ContainsKey(tag);
-        }
-
-        public DDField GetField(int tag)
-        {
-            return _fieldsByTag[tag];
+            if(Messages.ContainsKey(msg.MsgType))
+                throw new ApplicationException($"dupe message type: {msg.MsgType}");
+            Messages[msg.MsgType] = msg;
         }
     }
 }

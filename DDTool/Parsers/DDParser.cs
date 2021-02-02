@@ -23,8 +23,8 @@ namespace DDTool.Parsers
 
                 SetVersionInfo(doc, dd);
                 ParseFields(doc, dd);
+                ParseMessages(doc, dd);
                 /*
-                ParseMessages(RootDoc);
                 ParseHeader(RootDoc);
                 ParseTrailer(RootDoc)
                 */
@@ -62,16 +62,16 @@ namespace DDTool.Parsers
             }
         }
 
-        private static DDField CreateField(XmlNode fldEl)
+        private static DDField CreateField(XmlNode node)
         {
-            String tagstr = fldEl.Attributes["number"].Value;
-            String name = fldEl.Attributes["name"].Value;
-            String fldType = fldEl.Attributes["type"].Value;
+            String tagstr = node.Attributes["number"].Value;
+            String name = node.Attributes["name"].Value;
+            String fldType = node.Attributes["type"].Value;
             int tag = int.Parse(tagstr);
             Dictionary<String, String> enums = new Dictionary<String, String>();
-            if (fldEl.HasChildNodes)
+            if (node.HasChildNodes)
             {
-                foreach (XmlNode enumEl in fldEl.SelectNodes(".//value"))
+                foreach (XmlNode enumEl in node.SelectNodes(".//value"))
                 {
                     string description = String.Empty;
                     if (enumEl.Attributes["description"] != null)
@@ -80,6 +80,25 @@ namespace DDTool.Parsers
                 }
             }
             return new DDField(tag, name, enums, fldType);
+        }
+
+        public static void ParseMessages(XmlDocument doc, DataDictionary dd)
+        {
+            XmlNodeList nodeList = doc.SelectNodes("//messages/message");
+            foreach (XmlNode msgNode in nodeList)
+            {
+                dd.AddMessage(CreateMessage(msgNode));
+            }
+        }
+
+        private static DDMessage CreateMessage(XmlNode node)
+        {
+            var ddMsg = new DDMessage(
+                node.Attributes["name"].Value,
+                node.Attributes["msgtype"].Value,
+                node.Attributes["msgcat"].Value);
+                
+            return ddMsg;
         }
     }
 }

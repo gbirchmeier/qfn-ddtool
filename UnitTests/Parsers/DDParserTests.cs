@@ -67,16 +67,42 @@ namespace UnitTests.Parsers
 
             var dd = ReadDD(xml.ToString(), DDParser.ParseFields);
 
-            var fld = dd.GetField(1);
+            Assert.AreEqual(3, dd.FieldsByTag.Count);
+
+            var fld = dd.FieldsByTag[1];
             Assert.AreEqual("1:Account:STRING", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
-            fld = dd.GetField(14);
+            fld = dd.FieldsByTag[14];
             Assert.AreEqual("14:CumQty:QTY", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
 
-            fld = dd.GetField(4);
+            fld = dd.FieldsByTag[4];
             Assert.AreEqual("4:AdvSide:CHAR", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
             Assert.AreEqual(2, fld.EnumDict.Count);
             Assert.AreEqual("BUY", fld.EnumDict["B"]);
             Assert.AreEqual("Sell", fld.EnumDict["S"]);
+        }
+
+        [TestMethod]
+        public void ParseMessages()
+        {
+            var xml = new StringBuilder();
+            xml.AppendLine("<fix><messages>");
+            xml.AppendLine("  <message name='Heartbeat' msgtype='0' msgcat='admin'>");
+            xml.AppendLine("    <field name='TestReqID' required='N' />");
+            xml.AppendLine("  </message>");
+            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
+            xml.AppendLine("    <field name='OrigTime' required='N' />");
+            xml.AppendLine("    <field name='Urgency' required='N' />");
+            xml.AppendLine("    <field name='Headline' required='Y' />");
+            xml.AppendLine("  </message>");
+            xml.AppendLine("</messages></fix>");
+
+            var dd = ReadDD(xml.ToString(), DDParser.ParseMessages);
+            Assert.AreEqual(2, dd.Messages.Count);
+
+            var msg = dd.Messages["0"];
+            Assert.AreEqual("0:Heartbeat:admin", $"{msg.MsgType}:{msg.Name}:{msg.Cat}");
+            msg = dd.Messages["B"];
+            Assert.AreEqual("B:News:app", $"{msg.MsgType}:{msg.Name}:{msg.Cat}");
         }
     }
 }
