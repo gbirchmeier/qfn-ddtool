@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DDTool.Exceptions;
 
 namespace DDTool.Structures
 {
@@ -31,14 +32,14 @@ namespace DDTool.Structures
         public void AddField(DDField fld)
         {
             if (FieldsByTag.ContainsKey(fld.Tag))
-                throw new ApplicationException($"dupe field tag: {fld.Tag}");
+                throw new ParsingException($"dupe field tag: {fld.Tag}");
             FieldsByTag[fld.Tag] = fld;
         }
 
         public void AddMessage(DDMessage msg)
         {
             if(Messages.ContainsKey(msg.MsgType))
-                throw new ApplicationException($"dupe message type: {msg.MsgType}");
+                throw new ParsingException($"dupe message type: {msg.MsgType}");
             Messages[msg.MsgType] = msg;
         }
     }
