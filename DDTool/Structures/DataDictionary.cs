@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DDTool.Structures
 {
@@ -31,6 +30,16 @@ namespace DDTool.Structures
         public void AddField(DDField fld)
         {
             _fieldsByTag[fld.Tag] = fld;
+        }
+
+        public bool HasField(int tag)
+        {
+            return _fieldsByTag.ContainsKey(tag);
+        }
+
+        public DDField GetField(int tag)
+        {
+            return _fieldsByTag[tag];
         }
     }
 }

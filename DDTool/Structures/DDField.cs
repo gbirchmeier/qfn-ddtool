@@ -22,7 +22,7 @@ namespace DDTool.Structures
             this.Tag = tag;
             this.Name = name;
             this.EnumDict = new Dictionary<string, string>(enums);
-            this.FixFieldType = fixFieldType;
+            this.FixFieldType = fixFieldType.ToUpperInvariant();
         }
     }
 }

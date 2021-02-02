@@ -53,7 +53,7 @@ namespace DDTool.Parsers
                 dd.ServicePack = node.Value;
         }
 
-        private static void ParseFields(XmlDocument doc, DataDictionary dd)
+        public static void ParseFields(XmlDocument doc, DataDictionary dd)
         {
             XmlNodeList nodeList = doc.SelectNodes("//fields/field");
             foreach (XmlNode fldEl in nodeList)
