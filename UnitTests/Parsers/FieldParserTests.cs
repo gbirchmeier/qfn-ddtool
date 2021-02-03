@@ -21,9 +21,14 @@ namespace UnitTests.Parsers
             xml.AppendLine("  <field number='14' name='CumQty' type='QTY' />");
             xml.AppendLine("</fields></fix>");
 
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), FieldParser.ParseFields);
+            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Fields);
 
             Assert.AreEqual(3, dd.FieldsByTag.Count);
+            Assert.AreEqual(3, dd.FieldsByName.Count);
+
+            Assert.AreEqual(dd.FieldsByTag[1], dd.FieldsByName["Account"]);
+            Assert.AreEqual(dd.FieldsByTag[4], dd.FieldsByName["AdvSide"]);
+            Assert.AreEqual(dd.FieldsByTag[14], dd.FieldsByName["CumQty"]);
 
             var fld = dd.FieldsByTag[1];
             Assert.AreEqual("1:Account:STRING", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");

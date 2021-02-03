@@ -11,8 +11,9 @@ namespace DDTool.Structures
         public string ServicePack { get; set; }
         public bool IsFIXT { get; set; } = false;
 
-        public Dictionary<int, DDField> FieldsByTag = new Dictionary<int, DDField>();
-        public Dictionary<string, DDMessage> Messages = new Dictionary<string, DDMessage>();
+        public Dictionary<int, DDField> FieldsByTag { get; } = new Dictionary<int, DDField>();
+        public Dictionary<string, DDField> FieldsByName { get; } = new Dictionary<string, DDField>();
+        public Dictionary<string, DDMessage> Messages { get; } = new Dictionary<string, DDMessage>();
 
         /// <summary>
         /// A combination of type/Major/Minor/SP.
@@ -32,14 +33,18 @@ namespace DDTool.Structures
         public void AddField(DDField fld)
         {
             if (FieldsByTag.ContainsKey(fld.Tag))
-                throw new ParsingException($"dupe field tag: {fld.Tag}");
+                throw new ParsingException($"Field tag is defined twice: {fld.Tag}");
             FieldsByTag[fld.Tag] = fld;
+
+            if (FieldsByName.ContainsKey(fld.Name))
+                throw new ParsingException($"Field name is defined twice: {fld.Tag}");
+            FieldsByName[fld.Name] = fld;
         }
 
         public void AddMessage(DDMessage msg)
         {
-            if(Messages.ContainsKey(msg.MsgType))
-                throw new ParsingException($"dupe message type: {msg.MsgType}");
+            if (Messages.ContainsKey(msg.MsgType))
+                throw new ParsingException($"Message type is defined twice: {msg.MsgType}");
             Messages[msg.MsgType] = msg;
         }
     }

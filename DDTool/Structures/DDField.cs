@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DDTool.Structures
 {
-    public class DDField
+    public class DDField : IElement
     {
         public int Tag { get; private set; }
         public String Name { get; private set; }

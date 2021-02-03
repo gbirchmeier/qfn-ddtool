@@ -1,16 +1,23 @@
+using System.Reflection.Metadata;
 using System;
 using System.IO;
 using System.Text;
 using System.Xml;
 using DDTool.Structures;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests.Parsers
 {
-    public delegate void ParserFunc(XmlDocument doc, DataDictionary dd);
+    public enum ParserTask
+    {
+        Version,
+        Fields,
+        Messages
+    }
 
     public static class ParserTestUtil
     {
-        public static DataDictionary ReadDD(string xml, ParserFunc parserFunc)
+        public static DataDictionary ReadDD(string xml, ParserTask task)
         {
             var dd = new DataDictionary();
 
@@ -23,7 +30,22 @@ namespace UnitTests.Parsers
                     var doc = new XmlDocument();
                     doc.Load(reader);
 
-                    parserFunc(doc, dd);
+                    switch (task)
+                    {
+                        case ParserTask.Version:
+                            DDTool.Parsers.VersionParser.SetVersionInfo(doc, dd);
+                            break;
+                        case ParserTask.Fields:
+                            DDTool.Parsers.FieldParser.ParseFields(doc, dd);
+                            break;
+                        case ParserTask.Messages:
+                            DDTool.Parsers.FieldParser.ParseFields(doc, dd);
+                            DDTool.Parsers.MessageParser.ParseMessages(doc, dd);
+                            break;
+                        default:
+                            Assert.Fail("unsupported task");
+                            break;
+                    }
                 }
             }
             return dd;
