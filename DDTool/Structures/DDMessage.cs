@@ -14,10 +14,17 @@ namespace DDTool.Structures
         public HashSet<int> RequiredElements { get; } = new HashSet<int>();
         public List<int> ElementOrder { get; } = new List<int>();
 
+        public DDMessage(string name, string msgType, string msgCat)
+        {
+            Name = name;
+            MsgType = msgType;
+            Cat = msgCat;
+        }
+
         public void AddField(DDField field, bool required)
         {
             if (Elements.ContainsKey(field.Tag))
-                throw new ParsingException($"Tag appears twice in top-level of message {MsgType}/{Name}");
+                throw new ParsingException($"Field tag {field.Tag} appears twice in top-level of message {MsgType}/{Name}");
 
             Elements[field.Tag] = field;
             ElementOrder.Add(field.Tag);
@@ -25,11 +32,15 @@ namespace DDTool.Structures
                 RequiredElements.Add(field.Tag);
         }
 
-        public DDMessage(string name, string msgType, string msgCat)
+        public void AddGroup(DDGroup group, bool required)
         {
-            Name = name;
-            MsgType = msgType;
-            Cat = msgCat;
+            if (Elements.ContainsKey(group.Tag))
+                throw new ParsingException($"Group tag {group.Tag} appears twice in top-level of message {MsgType}/{Name}");
+
+            Elements[group.Tag] = group;
+            ElementOrder.Add(group.Tag);
+            if (required)
+                RequiredElements.Add(group.Tag);
         }
     }
 }

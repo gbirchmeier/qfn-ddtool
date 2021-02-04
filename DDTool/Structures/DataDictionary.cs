@@ -47,5 +47,16 @@ namespace DDTool.Structures
                 throw new ParsingException($"Message type is defined twice: {msg.MsgType}");
             Messages[msg.MsgType] = msg;
         }
+
+        /// <summary>
+        /// Lookup the field by name.  Throw ParsingException if not found.
+        /// </summary>
+        /// <param name="fieldName"></param>
+        public DDField LookupField(string fieldName)
+        {
+            if (!FieldsByName.ContainsKey(fieldName))
+                throw new ParsingException($"Field '{fieldName}' is not defined in <fields> section.");
+            return FieldsByName[fieldName];
+        }
     }
 }
