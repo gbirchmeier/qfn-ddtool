@@ -13,11 +13,11 @@ namespace DDTool.Parsers
             XmlNodeList nodeList = doc.SelectNodes("//messages/message");
             foreach (XmlNode msgNode in nodeList)
             {
-                dd.AddMessage(CreateMessage(msgNode, dd));
+                dd.AddMessage(CreateMessage(msgNode, dd, doc));
             }
         }
 
-        private static DDMessage CreateMessage(XmlNode node, DataDictionary dd)
+        private static DDMessage CreateMessage(XmlNode node, DataDictionary dd, XmlDocument doc)
         {
             var ddMsg = new DDMessage(
                 node.Attributes["name"].Value,
@@ -25,12 +25,12 @@ namespace DDTool.Parsers
                 node.Attributes["msgcat"].Value);
 
             foreach (XmlNode childNode in node.ChildNodes)
-                ReadChildNode(childNode, ddMsg, dd);
+                ReadChildNode(childNode, ddMsg, dd, doc);
 
             return ddMsg;
         }
 
-        private static DDGroup CreateGroup(XmlNode node, DataDictionary dd)
+        private static DDGroup CreateGroup(XmlNode node, DataDictionary dd, XmlDocument doc)
         {
             var groupName = node.Attributes["name"].Value;
             var counterField = dd.LookupField(groupName);
@@ -49,13 +49,14 @@ namespace DDTool.Parsers
                 if (childNode == node.ChildNodes[0])
                     continue; // already did the first (delimiter) node
 
-                ReadChildNode(childNode, ddGroup, dd);
+                ReadChildNode(childNode, ddGroup, dd, doc);
             }
 
             return ddGroup;
         }
 
-        private static void ReadChildNode(XmlNode childNode, IElementSequence elSeq, DataDictionary dd)
+        private static void ReadChildNode(
+            XmlNode childNode, IElementSequence elSeq, DataDictionary dd, XmlDocument doc)
         {
             switch (childNode.Name.ToLowerInvariant())
             {
@@ -67,12 +68,21 @@ namespace DDTool.Parsers
 
                 case "group":
                     elSeq.AddGroup(
-                        CreateGroup(childNode, dd),
+                        CreateGroup(childNode, dd, doc),
                         childNode.Attributes["required"]?.Value == "Y");
                     break;
 
                 case "component":
-                    throw new ParsingException("components not supported yet");
+                    var componentName = childNode.Attributes["name"].Value;
+                    XmlNode compNode = doc.SelectSingleNode($"//components/component[@name='{componentName}']");
+
+                    if (compNode == null)
+                        throw new ParsingException($"Can't find component: {componentName}");
+
+                    foreach (XmlNode innerCompNode in compNode.ChildNodes)
+                        ReadChildNode(innerCompNode, elSeq, dd, doc);
+
+                    break;
 
                 default:
                     throw new ParsingException($"Unrecognized or unsupported child node type \"{childNode.Name}\" within \"{elSeq.Name}\"");
