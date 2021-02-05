@@ -10,8 +10,6 @@ namespace DDTool.Structures
 
     public static class ElementSequenceImpl
     {
-
-
         public static void AddField(IElementSequence seq, DDField field, bool required)
         {
             if (seq.Elements.ContainsKey(field.Tag))
@@ -34,12 +32,7 @@ namespace DDTool.Structures
                 seq.RequiredElements.Add(group.Tag);
         }
 
-
-        /// <summary>
-        /// This is a lot of lines for a dumb utility function, but here we are.
-        /// </summary>
-        /// <param name="seq"></param>
-        /// <returns></returns>
+        // This is a lot of lines for a dumb utility function, but here we are.
         private static string SeqKind(IElementSequence seq)
         {
             if (seq.GetType() == typeof(DDMessage))
