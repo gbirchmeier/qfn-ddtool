@@ -25,28 +25,7 @@ namespace DDTool.Parsers
                 node.Attributes["msgcat"].Value);
 
             foreach (XmlNode childNode in node.ChildNodes)
-            {
-                switch (childNode.Name.ToLowerInvariant())
-                {
-                    case "field":
-                        ddMsg.AddField(
-                            dd.LookupField(childNode.Attributes["name"].Value),
-                            childNode.Attributes["required"]?.Value == "Y"); // TODO reject non-Y/N
-                        break;
-
-                    case "group":
-                        ddMsg.AddGroup(
-                            CreateGroup(childNode, dd),
-                            childNode.Attributes["required"]?.Value == "Y");
-                        break;
-
-                    case "component":
-                        throw new ParsingException("components not supported yet");
-
-                    default:
-                        throw new ParsingException($"Unrecognized or unsupported child node type \"{childNode.Name}\" within message \"{ddMsg.Name}\"");
-                }
-            }
+                ReadChildNode(childNode, ddMsg, dd);
 
             return ddMsg;
         }
@@ -57,9 +36,9 @@ namespace DDTool.Parsers
             var counterField = dd.LookupField(groupName);
 
             if (node.ChildNodes.Count < 1)
-                throw new ParsingException($"Group {groupName} is illegal.  It must have at least one child.");
+                throw new ParsingException($"Group {groupName} is illegal.  It must have at least one child (the delimiter).");
 
-            // TODO pretty sure this can be a group too
+            // TODO pretty sure this can be a group too, so need to handle this later
             var delimiterField = dd.LookupField(
                 node.ChildNodes[0].Attributes["name"].Value);
 
@@ -70,29 +49,34 @@ namespace DDTool.Parsers
                 if (childNode == node.ChildNodes[0])
                     continue; // already did the first (delimiter) node
 
-                switch (childNode.Name.ToLowerInvariant())
-                {
-                    case "field":
-                        ddGroup.AddField(
-                            dd.LookupField(childNode.Attributes["name"].Value),
-                            childNode.Attributes["required"]?.Value == "Y");
-                        break;
-
-                    case "group":
-                        ddGroup.AddGroup(
-                            CreateGroup(childNode, dd),
-                            childNode.Attributes["required"]?.Value == "Y");
-                        break;
-
-                    case "component":
-                        throw new ParsingException("nested components not supported yet");
-
-                    default:
-                        throw new ParsingException($"Unrecognized or unsupported child node type \"{childNode.Name}\" within group \"{ddGroup.CounterField.Name}\"");
-                }
+                ReadChildNode(childNode, ddGroup, dd);
             }
 
             return ddGroup;
+        }
+
+        private static void ReadChildNode(XmlNode childNode, IElementSequence elSeq, DataDictionary dd)
+        {
+            switch (childNode.Name.ToLowerInvariant())
+            {
+                case "field":
+                    elSeq.AddField(
+                        dd.LookupField(childNode.Attributes["name"].Value),
+                        childNode.Attributes["required"]?.Value == "Y");
+                    break;
+
+                case "group":
+                    elSeq.AddGroup(
+                        CreateGroup(childNode, dd),
+                        childNode.Attributes["required"]?.Value == "Y");
+                    break;
+
+                case "component":
+                    throw new ParsingException("components not supported yet");
+
+                default:
+                    throw new ParsingException($"Unrecognized or unsupported child node type \"{childNode.Name}\" within \"{elSeq.Name}\"");
+            }
         }
     }
 }

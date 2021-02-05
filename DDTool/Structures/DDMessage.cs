@@ -23,24 +23,12 @@ namespace DDTool.Structures
 
         public void AddField(DDField field, bool required)
         {
-            if (Elements.ContainsKey(field.Tag))
-                throw new ParsingException($"Field tag {field.Tag} appears twice in top-level of message {MsgType}/{Name}");
-
-            Elements[field.Tag] = field;
-            ElementOrder.Add(field.Tag);
-            if (required)
-                RequiredElements.Add(field.Tag);
+            ElementSequenceImpl.AddField(this, field, required);
         }
 
         public void AddGroup(DDGroup group, bool required)
         {
-            if (Elements.ContainsKey(group.Tag))
-                throw new ParsingException($"Group tag {group.Tag} appears twice in top-level of message {MsgType}/{Name}");
-
-            Elements[group.Tag] = group;
-            ElementOrder.Add(group.Tag);
-            if (required)
-                RequiredElements.Add(group.Tag);
+            ElementSequenceImpl.AddGroup(this, group, required);
         }
     }
 }
