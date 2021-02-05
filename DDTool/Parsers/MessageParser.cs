@@ -79,7 +79,11 @@ namespace DDTool.Parsers
                         break;
 
                     case "group":
-                        throw new ParsingException("nested groups not supported yet");
+                        ddGroup.AddGroup(
+                            CreateGroup(childNode, dd),
+                            childNode.Attributes["required"]?.Value == "Y");
+                        break;
+
                     case "component":
                         throw new ParsingException("nested components not supported yet");
 

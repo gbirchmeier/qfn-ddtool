@@ -57,7 +57,7 @@ namespace UnitTests.Parsers
         }
 
         [TestMethod]
-        public void ParseMessageWithOneGroup()
+        public void ParseMessageWithFlatGroups()
         {
             var xml = new StringBuilder();
             xml.AppendLine("<fix><messages>");
@@ -69,6 +69,9 @@ namespace UnitTests.Parsers
             xml.AppendLine("       <field name='EncodedTextLen' required='N' />");
             xml.AppendLine("       <field name='EncodedText' required='N' />");
             xml.AppendLine("    </group>");
+            xml.AppendLine("    <group name='NoDoots' required='N'>");
+            xml.AppendLine("       <field name='Doot' required='Y' />");
+            xml.AppendLine("    </group>");
             xml.AppendLine("  </message>");
             xml.AppendLine("  <fields>");
             xml.AppendLine("    <field number='33' name='LinesOfText' type='NUMINGROUP' />");
@@ -76,6 +79,8 @@ namespace UnitTests.Parsers
             xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
             xml.AppendLine("    <field number='354' name='EncodedTextLen' type='LENGTH' />");
             xml.AppendLine("    <field number='355' name='EncodedText' type='DATA' />");
+            xml.AppendLine("    <field number='500' name='NoDoots' type='NUMINGROUP' />");
+            xml.AppendLine("    <field number='501' name='Doot' type='STRING' />");
             xml.AppendLine("    <field number='999' name='Wahwah' type='INT' />");
             xml.AppendLine("  </fields>");
             xml.AppendLine("</messages></fix>");
@@ -84,9 +89,9 @@ namespace UnitTests.Parsers
             Assert.AreEqual(1, dd.Messages.Count);
 
             var msg = dd.Messages["B"];
-            Assert.AreEqual(2, msg.Elements.Count);
+            Assert.AreEqual(3, msg.Elements.Count);
 
-            CollectionAssert.AreEqual(new int[] { 148, 33 }, msg.ElementOrder.ToArray());
+            CollectionAssert.AreEqual(new int[] { 148, 33, 500 }, msg.ElementOrder.ToArray());
             CollectionAssert.AreEqual(new int[] { 33, 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
 
             var headline = msg.Elements[148];
@@ -99,6 +104,67 @@ namespace UnitTests.Parsers
             // Delimiter is not included in the following
             CollectionAssert.AreEqual(new int[] { 999, 354, 355 }, linesOfText.ElementOrder.ToArray());
             CollectionAssert.AreEqual(new int[] { 999 }, linesOfText.RequiredElements.ToArray());
+
+            var noDoots = (DDTool.Structures.DDGroup)msg.Elements[500];
+            Assert.AreEqual(0, noDoots.Elements.Count);
+            Assert.AreEqual(500, noDoots.CounterField.Tag);
+            Assert.AreEqual(501, noDoots.DelimiterElement.Tag);
+            Assert.AreEqual(0, noDoots.ElementOrder.Count);
+            Assert.AreEqual(0, noDoots.RequiredElements.Count);
+        }
+
+        [TestMethod]
+        public void ParseMessageWithNestedGroup()
+        {
+            var xml = new StringBuilder();
+            xml.AppendLine("<fix><messages>");
+            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
+            xml.AppendLine("    <field name='Headline' required='Y' />");
+            xml.AppendLine("    <group name='LinesOfText' required='Y'>");
+            xml.AppendLine("      <field name='Text' required='Y' />");
+            xml.AppendLine("      <group name='FooNest' required='N'>");
+            xml.AppendLine("        <field name='FooDelim' required='Y' />");
+            xml.AppendLine("        <field name='FooField' required='Y' />");
+            xml.AppendLine("      </group>");
+            xml.AppendLine("      <group name='BarNest' required='Y'>");
+            xml.AppendLine("        <field name='BarDelim' required='Y' />");
+            xml.AppendLine("        <field name='BarField' required='N' />");
+            xml.AppendLine("      </group>");
+            xml.AppendLine("    </group>");
+            xml.AppendLine("  </message>");
+            xml.AppendLine("  <fields>");
+            xml.AppendLine("    <field number='33' name='LinesOfText' type='NUMINGROUP' />");
+            xml.AppendLine("    <field number='58' name='Text' type='STRING' />");
+            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
+            xml.AppendLine("    <field number='200' name='FooNest' type='NUMINGROUP' />");
+            xml.AppendLine("    <field number='201' name='FooDelim' type='STRING' />");
+            xml.AppendLine("    <field number='202' name='FooField' type='STRING' />");
+            xml.AppendLine("    <field number='300' name='BarNest' type='NUMINGROUP' />");
+            xml.AppendLine("    <field number='301' name='BarDelim' type='STRING' />");
+            xml.AppendLine("    <field number='302' name='BarField' type='STRING' />");
+            xml.AppendLine("  </fields>");
+            xml.AppendLine("</messages></fix>");
+
+            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
+            Assert.AreEqual(1, dd.Messages.Count);
+
+            var linesOfText = (DDTool.Structures.DDGroup)dd.Messages["B"].Elements[33];
+            Assert.AreEqual(2, linesOfText.Elements.Count);
+
+            CollectionAssert.AreEqual(new int[] { 200, 300 }, linesOfText.ElementOrder.ToArray());
+            CollectionAssert.AreEqual(new int[] { 300 }, linesOfText.RequiredElements.ToArray());
+
+            var fooNest = (DDTool.Structures.DDGroup)linesOfText.Elements[200];
+            Assert.AreEqual(200, fooNest.CounterField.Tag);
+            Assert.AreEqual(201, fooNest.DelimiterElement.Tag);
+            CollectionAssert.AreEqual(new int[] { 202 }, fooNest.ElementOrder.ToArray());
+            CollectionAssert.AreEqual(new int[] { 202 }, fooNest.RequiredElements.ToArray());
+
+            var barNest = (DDTool.Structures.DDGroup)linesOfText.Elements[300];
+            Assert.AreEqual(300, barNest.CounterField.Tag);
+            Assert.AreEqual(301, barNest.DelimiterElement.Tag);
+            CollectionAssert.AreEqual(new int[] { 302 }, barNest.ElementOrder.ToArray());
+            Assert.AreEqual(0, barNest.RequiredElements.Count);
         }
     }
 }
