@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DDTool.Exceptions;
 
 namespace DDTool.Structures
 {
@@ -21,14 +20,9 @@ namespace DDTool.Structures
             Cat = msgCat;
         }
 
-        public void AddField(DDField field, bool required)
+        public void AddElement(IElement element, bool required)
         {
-            ElementSequenceImpl.AddField(this, field, required);
-        }
-
-        public void AddGroup(DDGroup group, bool required)
-        {
-            ElementSequenceImpl.AddGroup(this, group, required);
+            ElementSequenceImpl.AddElement(this, element, required);
         }
     }
 }

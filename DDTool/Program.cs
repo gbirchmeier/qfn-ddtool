@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System;
+﻿using System;
 using DDTool.Parsers;
-using DDTool.Structures;
 
 namespace DDTool
 {

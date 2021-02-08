@@ -1,6 +1,7 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Collections.Generic;
-using DDTool.Exceptions;
 
 namespace DDTool.Structures
 {
@@ -10,37 +11,39 @@ namespace DDTool.Structures
         public string Name { get { return CounterField.Name; } }
 
         public DDField CounterField { get; private set; }
-        public IElement DelimiterElement { get; private set; }
+        public IElement Delimiter
+        {
+            get
+            {
+                if (ElementOrder.Count < 1)
+                    throw new InvalidDataException($"Group {Name}/{Tag} has no elements");
+                return Elements[ElementOrder.First()];
+            }
+        }
 
         /// <summary>
-        /// Does not include delimiter (which is obviously present)
+        /// The first element is the delimiter
         /// </summary>
         public Dictionary<int, IElement> Elements { get; } = new Dictionary<int, IElement>();
 
         /// <summary>
-        /// Does not include delimiter (which is always required)
+        /// Includes delimiter
         /// </summary>
         public HashSet<int> RequiredElements { get; } = new HashSet<int>();
 
         /// <summary>
-        /// Does not include delimiter (which is alwasy first)
+        /// Includes delimiter (which is always first)
         /// </summary>
         public List<int> ElementOrder { get; } = new List<int>();
 
-        public DDGroup(DDField counter, IElement delimiter) // TODO add ref to container, so exception can backtrace it
+        public DDGroup(DDField counter)
         {
             CounterField = counter;
-            DelimiterElement = delimiter;
         }
 
-        public void AddField(DDField field, bool required)
+        public void AddElement(IElement element, bool required)
         {
-            ElementSequenceImpl.AddField(this, field, required);
-        }
-
-        public void AddGroup(DDGroup group, bool required)
-        {
-            ElementSequenceImpl.AddGroup(this, group, required);
+            ElementSequenceImpl.AddElement(this, element, required);
         }
     }
 }

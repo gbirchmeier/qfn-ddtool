@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using System;
 using System.Xml;
 using DDTool.Exceptions;
@@ -38,17 +37,10 @@ namespace DDTool.Parsers
             if (node.ChildNodes.Count < 1)
                 throw new ParsingException($"Group {groupName} is illegal.  It must have at least one child (the delimiter).");
 
-            // TODO pretty sure this can be a group too, so need to handle this later
-            var delimiterField = dd.LookupField(
-                node.ChildNodes[0].Attributes["name"].Value);
-
-            DDGroup ddGroup = new DDGroup(counterField, delimiterField);
+            DDGroup ddGroup = new DDGroup(counterField);
 
             foreach (XmlNode childNode in node.ChildNodes)
             {
-                if (childNode == node.ChildNodes[0])
-                    continue; // already did the first (delimiter) node
-
                 ReadChildNode(childNode, ddGroup, dd, doc);
             }
 
@@ -61,13 +53,13 @@ namespace DDTool.Parsers
             switch (childNode.Name.ToLowerInvariant())
             {
                 case "field":
-                    elSeq.AddField(
+                    elSeq.AddElement(
                         dd.LookupField(childNode.Attributes["name"].Value),
                         childNode.Attributes["required"]?.Value == "Y");
                     break;
 
                 case "group":
-                    elSeq.AddGroup(
+                    elSeq.AddElement(
                         CreateGroup(childNode, dd, doc),
                         childNode.Attributes["required"]?.Value == "Y");
                     break;

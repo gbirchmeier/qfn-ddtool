@@ -11,7 +11,6 @@ namespace DDTool.Structures
         public HashSet<int> RequiredElements { get; }
         public List<int> ElementOrder { get; }
 
-        public void AddField(DDField field, bool required);
-        public void AddGroup(DDGroup group, bool required);
+        public void AddElement(IElement element, bool required);
     }
 }

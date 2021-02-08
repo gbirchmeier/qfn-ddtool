@@ -10,36 +10,15 @@ namespace DDTool.Structures
 
     public static class ElementSequenceImpl
     {
-        public static void AddField(IElementSequence seq, DDField field, bool required)
+        public static void AddElement(IElementSequence seq, IElement element, bool required)
         {
-            if (seq.Elements.ContainsKey(field.Tag))
-                throw new ParsingException($"Field tag {field.Tag} appears twice in top-level of {SeqKind(seq)} {seq.Name}");
+            if (seq.Elements.ContainsKey(element.Tag))
+                throw new ParsingException($"Tag {element.Tag} appears twice in {seq.Name}");
 
-            seq.Elements[field.Tag] = field;
-            seq.ElementOrder.Add(field.Tag);
+            seq.Elements[element.Tag] = element;
+            seq.ElementOrder.Add(element.Tag);
             if (required)
-                seq.RequiredElements.Add(field.Tag);
-        }
-
-        public static void AddGroup(IElementSequence seq, DDGroup group, bool required)
-        {
-            if (seq.Elements.ContainsKey(group.Tag))
-                throw new ParsingException($"Group tag {group.Tag} appears twice in top-level of {SeqKind(seq)} {seq.Name}");
-
-            seq.Elements[group.Tag] = group;
-            seq.ElementOrder.Add(group.Tag);
-            if (required)
-                seq.RequiredElements.Add(group.Tag);
-        }
-
-        // This is a lot of lines for a dumb utility function, but here we are.
-        private static string SeqKind(IElementSequence seq)
-        {
-            if (seq.GetType() == typeof(DDMessage))
-                return "message";
-            else if (seq.GetType() == typeof(DDGroup))
-                return "group";
-            throw new NotImplementedException($"This function not implemented for type {seq.GetType().Name}");
+                seq.RequiredElements.Add(element.Tag);
         }
     }
 }
