@@ -19,7 +19,7 @@ namespace UnitTests.Parsers
     {
         public static DataDictionary ReadDD(string xml, ParserTask task)
         {
-            var dd = new DataDictionary();
+            var dd = new DataDictionary("unittest");
 
             XmlReaderSettings readerSettings = new XmlReaderSettings();
             readerSettings.IgnoreComments = true;

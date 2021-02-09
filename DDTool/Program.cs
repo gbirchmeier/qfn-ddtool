@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using DDTool.Parsers;
+using DDTool.Structures;
 
 namespace DDTool
 {
@@ -31,12 +33,35 @@ namespace DDTool
                 Console.WriteLine($"If codegen was supported, I'd write it to: {options.OutputDir}");
             }
 
+            var errors = new List<string>();
+
+            var dds = ParseDDs(options);
+            foreach (DataDictionary dd in dds)
+            {
+                List<string> ddErrors = DDTool.Validations.FieldValidator.Check(dd);
+                foreach(string dde in ddErrors)
+                    errors.Add($"{dd.SourceFile}: {dde}");
+            }
+
+            if (errors.Count > 0)
+            {
+                Console.WriteLine("============================");
+                Console.WriteLine("Errors found.  Code generation (if commanded) will not run.");
+                foreach(var err in errors)
+                    Console.WriteLine($"* {err}");
+            }
+        }
+
+        static List<DataDictionary> ParseDDs(Options options)
+        {
+            var dds = new List<DataDictionary>();
             foreach (var path in options.DDFiles)
             {
                 try
                 {
                     var dd = DDParser.ParseFile(path);
                     Console.WriteLine($"Parsed! -- {dd.Identifier}");
+                    dds.Add(dd);
                 }
                 catch (ApplicationException ex)
                 {
@@ -45,6 +70,15 @@ namespace DDTool
                     Environment.Exit(1);
                 }
             }
+            return dds;
         }
+
+/*
+        static List<DDField> AggregateFields(List<DataDictionary> dds)
+        {
+            var fields = new List<DDField>();
+            return fields;
+        }
+*/
     }
 }

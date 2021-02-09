@@ -8,7 +8,7 @@ namespace DDTool.Parsers
     {
         public static DataDictionary ParseFile(string path)
         {
-            var dd = new DataDictionary();
+            var dd = new DataDictionary(path);
 
             XmlReaderSettings readerSettings = new XmlReaderSettings();
             readerSettings.IgnoreComments = true;

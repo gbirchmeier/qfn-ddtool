@@ -6,6 +6,12 @@ namespace DDTool.Structures
 {
     public class DataDictionary
     {
+        /// <summary>
+        /// This is purely informative.  You can set it to nonsense if you want.
+        /// </summary>
+        /// <value></value>
+        public string SourceFile { get; set; }
+
         public string MajorVersion { get; set; }
         public string MinorVersion { get; set; }
         public string ServicePack { get; set; }
@@ -14,6 +20,11 @@ namespace DDTool.Structures
         public Dictionary<int, DDField> FieldsByTag { get; } = new Dictionary<int, DDField>();
         public Dictionary<string, DDField> FieldsByName { get; } = new Dictionary<string, DDField>();
         public Dictionary<string, DDMessage> Messages { get; } = new Dictionary<string, DDMessage>();
+
+        public DataDictionary(string sourceFile)
+        {
+            SourceFile = sourceFile;
+        }
 
         /// <summary>
         /// A combination of type/Major/Minor/SP.
