@@ -1,45 +1,37 @@
 using System;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 using DDTool.Parsers;
+using Xunit;
 
 namespace UnitTests.Parsers
 {
-    [TestClass]
     public class FieldParserTests
     {
-        [TestMethod]
-        public void ParseFields()
+        [Theory]
+        [InlineData("UnitTests.Resources.Fields.Example.txt")]
+        public async Task ParseFields(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><fields>");
-            xml.AppendLine("  <field number='1' name='Account' type='sTRING'/>");
-            xml.AppendLine("  <field number='4' name='AdvSide' type='CHaR'>");
-            xml.AppendLine("    <value enum='B' description='BUY'/>");
-            xml.AppendLine("    <value enum='S' description='Sell'/>");
-            xml.AppendLine("  </field>");
-            xml.AppendLine("  <field number='14' name='CumQty' type='QTY' />");
-            xml.AppendLine("</fields></fix>");
+            var fields = await resourceName.GetResourceStringAsync<FieldParserTests>();
+            var dd = ParserTestUtil.ReadDD(fields, ParserTask.Fields);
 
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Fields);
+            Assert.Equal(3, dd.FieldsByTag.Count);
+            Assert.Equal(3, dd.FieldsByName.Count);
 
-            Assert.AreEqual(3, dd.FieldsByTag.Count);
-            Assert.AreEqual(3, dd.FieldsByName.Count);
-
-            Assert.AreEqual(dd.FieldsByTag[1], dd.FieldsByName["Account"]);
-            Assert.AreEqual(dd.FieldsByTag[4], dd.FieldsByName["AdvSide"]);
-            Assert.AreEqual(dd.FieldsByTag[14], dd.FieldsByName["CumQty"]);
+            Assert.Equal(dd.FieldsByTag[1], dd.FieldsByName["Account"]);
+            Assert.Equal(dd.FieldsByTag[4], dd.FieldsByName["AdvSide"]);
+            Assert.Equal(dd.FieldsByTag[14], dd.FieldsByName["CumQty"]);
 
             var fld = dd.FieldsByTag[1];
-            Assert.AreEqual("1:Account:STRING", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
+            Assert.Equal("1:Account:STRING", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
             fld = dd.FieldsByTag[14];
-            Assert.AreEqual("14:CumQty:QTY", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
+            Assert.Equal("14:CumQty:QTY", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
 
             fld = dd.FieldsByTag[4];
-            Assert.AreEqual("4:AdvSide:CHAR", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
-            Assert.AreEqual(2, fld.EnumDict.Count);
-            Assert.AreEqual("BUY", fld.EnumDict["B"]);
-            Assert.AreEqual("Sell", fld.EnumDict["S"]);
+            Assert.Equal("4:AdvSide:CHAR", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
+            Assert.Equal(2, fld.EnumDict.Count);
+            Assert.Equal("BUY", fld.EnumDict["B"]);
+            Assert.Equal("Sell", fld.EnumDict["S"]);
         }
     }
 }

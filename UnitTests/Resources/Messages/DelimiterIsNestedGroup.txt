@@ -1,0 +1,21 @@
+﻿<fix><messages>
+  <message name='News' msgtype='B' msgcat='app'>
+    <field name='Headline' required='Y' />
+    <group name='Group11' required='Y'>
+      <group name='Group12' required='N'>
+        <group name='Group13' required='N'>
+          <field name='Delim100' required='Y' />
+          <field name='Field101' required='Y' />
+        </group>
+      </group>
+    </group>
+  </message>
+  <fields>
+    <field number='148' name='Headline' type='STRING' />
+    <field number='11' name='Group11' type='NUMINGROUP' />
+    <field number='12' name='Group12' type='NUMINGROUP' />
+    <field number='13' name='Group13' type='NUMINGROUP' />
+    <field number='100' name='Delim100' type='STRING' />
+    <field number='101' name='Field101' type='STRING' />
+  </fields>
+</messages></fix>

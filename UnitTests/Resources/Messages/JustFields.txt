@@ -1,0 +1,12 @@
+﻿<fix><messages>
+  <message name='News' msgtype='B' msgcat='app'>
+    <field name='OrigTime' required='N' />
+    <field name='Urgency' required='N' />
+    <field name='Headline' required='Y' />
+  </message>
+  <fields>
+    <field number='42' name='OrigTime' type='UTCTIMESTAMP' />
+    <field number='61' name='Urgency' type='CHAR' />
+    <field number='148' name='Headline' type='STRING' />
+  </fields>
+</messages></fix>

@@ -1,0 +1,27 @@
+﻿<fix><messages>
+  <message name='News' msgtype='B' msgcat='app'>
+    <field name='Headline' required='Y' />
+    <group name='LinesOfText' required='Y'>
+      <field name='Text' required='Y' />
+      <group name='FooNest' required='N'>
+        <field name='FooDelim' required='Y' />
+        <field name='FooField' required='Y' />
+      </group>
+      <group name='BarNest' required='Y'>
+        <field name='BarDelim' required='Y' />
+        <field name='BarField' required='N' />
+      </group>
+    </group>
+  </message>
+  <fields>
+    <field number='33' name='LinesOfText' type='NUMINGROUP' />
+    <field number='58' name='Text' type='STRING' />
+    <field number='148' name='Headline' type='STRING' />
+    <field number='200' name='FooNest' type='NUMINGROUP' />
+    <field number='201' name='FooDelim' type='STRING' />
+    <field number='202' name='FooField' type='STRING' />
+    <field number='300' name='BarNest' type='NUMINGROUP' />
+    <field number='301' name='BarDelim' type='STRING' />
+    <field number='302' name='BarField' type='STRING' />
+  </fields>
+</messages></fix>

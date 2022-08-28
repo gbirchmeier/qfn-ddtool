@@ -1,0 +1,24 @@
+﻿<fix><messages>
+  <message name='News' msgtype='B' msgcat='app'>
+    <field name='Headline' required='Y' />
+    <group name='LinesOfText' required='Y'>
+       <field name='Text' required='Y' />
+       <field name='Wahwah' required='Y' />
+       <field name='EncodedTextLen' required='N' />
+       <field name='EncodedText' required='N' />
+    </group>
+    <group name='NoDoots' required='N'>
+       <field name='Doot' required='Y' />
+    </group>
+  </message>
+  <fields>
+    <field number='33' name='LinesOfText' type='NUMINGROUP' />
+    <field number='58' name='Text' type='STRING' />
+    <field number='148' name='Headline' type='STRING' />
+    <field number='354' name='EncodedTextLen' type='LENGTH' />
+    <field number='355' name='EncodedText' type='DATA' />
+    <field number='500' name='NoDoots' type='NUMINGROUP' />
+    <field number='501' name='Doot' type='STRING' />
+    <field number='999' name='Wahwah' type='INT' />
+  </fields>
+</messages></fix>
