@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using DDTool.Structures;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace UnitTests.Parsers
 {

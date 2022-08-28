@@ -1,0 +1,20 @@
+﻿<fix><messages>
+  <message name='News' msgtype='B' msgcat='app'>
+    <field name='Headline' required='Y' />
+    <component name='Doots' />
+  </message>
+  <components>
+    <component name='Doots'>
+      <group name='NoDoots' required='N'>
+        <field name='Field66' required='Y' />
+        <field name='Field67' required='N' />
+      </group>
+    </component>
+  </components>
+  <fields>
+    <field number='148' name='Headline' type='STRING' />
+    <field number='900' name='NoDoots' type='NUMINGROUP' />
+    <field number='66' name='Field66' type='STRING' />
+    <field number='67' name='Field67' type='STRING' />
+  </fields>
+</messages></fix>

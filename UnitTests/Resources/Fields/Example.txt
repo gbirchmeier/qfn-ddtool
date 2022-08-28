@@ -1,0 +1,8 @@
+﻿<fix><fields>
+  <field number='1' name='Account' type='sTRING'/>
+  <field number='4' name='AdvSide' type='CHaR'>
+    <value enum='B' description='BUY'/>
+    <value enum='S' description='Sell'/>
+  </field>
+  <field number='14' name='CumQty' type='QTY' />
+</fields></fix>

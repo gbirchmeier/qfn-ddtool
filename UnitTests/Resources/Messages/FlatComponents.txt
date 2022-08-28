@@ -1,0 +1,22 @@
+﻿<fix><messages>
+  <message name='News' msgtype='B' msgcat='app'>
+    <component name='XComponent' />
+    <component name='YComponent' />
+  </message>
+  <components>
+    <component name='XComponent'>
+      <field name='Field66' required='Y' />
+      <field name='Field67' required='N' />
+    </component>
+    <component name='YComponent'>
+      <field name='Field77' required='N' />
+      <field name='Field78' required='Y' />
+    </component>
+  </components>
+  <fields>
+    <field number='66' name='Field66' type='STRING' />
+    <field number='67' name='Field67' type='STRING' />
+    <field number='77' name='Field77' type='STRING' />
+    <field number='78' name='Field78' type='STRING' />
+  </fields>
+</messages></fix>

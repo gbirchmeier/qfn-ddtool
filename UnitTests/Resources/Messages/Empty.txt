@@ -1,0 +1,6 @@
+﻿<fix><messages>
+  <message name='Heartbeat' msgtype='0' msgcat='admin'>
+  </message>
+  <message name='News' msgtype='B' msgcat='app'>
+  </message>
+</messages></fix>

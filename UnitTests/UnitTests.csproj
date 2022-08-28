@@ -1,16 +1,43 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\FieldsExample.txt" />
+    <None Remove="Resources\Messages\ComponentContentIsGroup.txt" />
+    <None Remove="Resources\Messages\ComponentIsGroup.txt" />
+    <None Remove="Resources\Messages\DelimiterIsNestedGroup.txt" />
+    <None Remove="Resources\Messages\Empty.txt" />
+    <None Remove="Resources\Messages\FlatComponents.txt" />
+    <None Remove="Resources\Messages\FlatGroups.txt" />
+    <None Remove="Resources\Messages\JustFields.txt" />
+    <None Remove="Resources\Messages\NestedGroup.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Fields\Example.txt" />
+    <EmbeddedResource Include="Resources\Messages\ComponentContentIsGroup.txt" />
+    <EmbeddedResource Include="Resources\Messages\ComponentIsGroup.txt" />
+    <EmbeddedResource Include="Resources\Messages\DelimiterIsNestedGroup.txt" />
+    <EmbeddedResource Include="Resources\Messages\Empty.txt" />
+    <EmbeddedResource Include="Resources\Messages\FlatComponents.txt" />
+    <EmbeddedResource Include="Resources\Messages\FlatGroups.txt" />
+    <EmbeddedResource Include="Resources\Messages\JustFields.txt" />
+    <EmbeddedResource Include="Resources\Messages\NestedGroup.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

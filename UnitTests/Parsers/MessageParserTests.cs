@@ -1,314 +1,163 @@
+using DDTool.Structures;
 using System;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace UnitTests.Parsers
 {
-    [TestClass]
     public class MessageParserTests
     {
-        [TestMethod]
-        public void Empty()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.Empty.txt")]
+        public async Task Empty(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='Heartbeat' msgtype='0' msgcat='admin'>");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("</messages></fix>");
-
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
-            Assert.AreEqual(2, dd.Messages.Count);
+            var emptyMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(emptyMessage, ParserTask.Messages);
+            Assert.Equal(2, dd.Messages.Count);
 
             var msg = dd.Messages["0"];
-            Assert.AreEqual("0:Heartbeat:admin", $"{msg.MsgType}:{msg.Name}:{msg.Cat}");
+            Assert.Equal("0:Heartbeat:admin", $"{msg.MsgType}:{msg.Name}:{msg.Cat}");
             msg = dd.Messages["B"];
-            Assert.AreEqual("B:News:app", $"{msg.MsgType}:{msg.Name}:{msg.Cat}");
+            Assert.Equal("B:News:app", $"{msg.MsgType}:{msg.Name}:{msg.Cat}");
         }
 
-        [TestMethod]
-        public void JustFields()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.JustFields.txt")]
+        public async Task JustFields(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <field name='OrigTime' required='N' />");
-            xml.AppendLine("    <field name='Urgency' required='N' />");
-            xml.AppendLine("    <field name='Headline' required='Y' />");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='42' name='OrigTime' type='UTCTIMESTAMP' />");
-            xml.AppendLine("    <field number='61' name='Urgency' type='CHAR' />");
-            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
-
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
-            Assert.AreEqual(1, dd.Messages.Count);
+            var fieldMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(fieldMessage, ParserTask.Messages);
+            Assert.Single(dd.Messages);
 
             var msg = dd.Messages["B"];
-            Assert.AreEqual(3, msg.Elements.Count);
+            Assert.Equal(3, msg.Elements.Count);
 
-            CollectionAssert.AreEqual(new int[] { 42, 61, 148 }, msg.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
+            Assert.Equal(new int[] { 42, 61, 148 }, msg.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
         }
 
-        [TestMethod]
-        public void FlatGroups()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.FlatGroups.txt")]
+        public async Task FlatGroups(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <field name='Headline' required='Y' />");
-            xml.AppendLine("    <group name='LinesOfText' required='Y'>");
-            xml.AppendLine("       <field name='Text' required='Y' />");
-            xml.AppendLine("       <field name='Wahwah' required='Y' />");
-            xml.AppendLine("       <field name='EncodedTextLen' required='N' />");
-            xml.AppendLine("       <field name='EncodedText' required='N' />");
-            xml.AppendLine("    </group>");
-            xml.AppendLine("    <group name='NoDoots' required='N'>");
-            xml.AppendLine("       <field name='Doot' required='Y' />");
-            xml.AppendLine("    </group>");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='33' name='LinesOfText' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='58' name='Text' type='STRING' />");
-            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
-            xml.AppendLine("    <field number='354' name='EncodedTextLen' type='LENGTH' />");
-            xml.AppendLine("    <field number='355' name='EncodedText' type='DATA' />");
-            xml.AppendLine("    <field number='500' name='NoDoots' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='501' name='Doot' type='STRING' />");
-            xml.AppendLine("    <field number='999' name='Wahwah' type='INT' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
-
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
-            Assert.AreEqual(1, dd.Messages.Count);
+            var flatGroupMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(flatGroupMessage, ParserTask.Messages);
+            Assert.Single(dd.Messages);
 
             var msg = dd.Messages["B"];
-            Assert.AreEqual(3, msg.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 148, 33, 500 }, msg.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 33, 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
+            Assert.Equal(3, msg.Elements.Count);
+            Assert.Equal(new int[] { 148, 33, 500 }, msg.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 33, 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
 
             var headline = msg.Elements[148];
-            Assert.IsInstanceOfType(headline, typeof(DDTool.Structures.DDField));
+            Assert.IsType<DDField>(headline);
 
-            var linesOfText = (DDTool.Structures.DDGroup)msg.Elements[33];
-            Assert.AreEqual(4, linesOfText.Elements.Count);
-            Assert.AreEqual(33, linesOfText.CounterField.Tag);
-            Assert.AreEqual(58, linesOfText.Delimiter.Tag);
-            CollectionAssert.AreEqual(new int[] { 58, 999, 354, 355 }, linesOfText.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 58, 999 }, linesOfText.RequiredElements.OrderBy(x => x).ToArray());
+            var linesOfText = (DDGroup)msg.Elements[33];
+            Assert.Equal(4, linesOfText.Elements.Count);
+            Assert.Equal(33, linesOfText.CounterField.Tag);
+            Assert.Equal(58, linesOfText.Delimiter.Tag);
+            Assert.Equal(new int[] { 58, 999, 354, 355 }, linesOfText.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 58, 999 }, linesOfText.RequiredElements.OrderBy(x => x).ToArray());
 
-            var noDoots = (DDTool.Structures.DDGroup)msg.Elements[500];
-            Assert.AreEqual(1, noDoots.Elements.Count);
-            Assert.AreEqual(500, noDoots.CounterField.Tag);
-            Assert.AreEqual(501, noDoots.Delimiter.Tag);
-            Assert.AreEqual(1, noDoots.ElementOrder.Count);
-            Assert.AreEqual(1, noDoots.RequiredElements.Count);
+            var noDoots = (DDGroup)msg.Elements[500];
+            Assert.Single(noDoots.Elements);
+            Assert.Equal(500, noDoots.CounterField.Tag);
+            Assert.Equal(501, noDoots.Delimiter.Tag);
+            Assert.Single(noDoots.ElementOrder);
+            Assert.Single(noDoots.RequiredElements);
         }
 
-        [TestMethod]
-        public void NestedGroup()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.NestedGroup.txt")]
+        public async Task NestedGroup(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <field name='Headline' required='Y' />");
-            xml.AppendLine("    <group name='LinesOfText' required='Y'>");
-            xml.AppendLine("      <field name='Text' required='Y' />");
-            xml.AppendLine("      <group name='FooNest' required='N'>");
-            xml.AppendLine("        <field name='FooDelim' required='Y' />");
-            xml.AppendLine("        <field name='FooField' required='Y' />");
-            xml.AppendLine("      </group>");
-            xml.AppendLine("      <group name='BarNest' required='Y'>");
-            xml.AppendLine("        <field name='BarDelim' required='Y' />");
-            xml.AppendLine("        <field name='BarField' required='N' />");
-            xml.AppendLine("      </group>");
-            xml.AppendLine("    </group>");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='33' name='LinesOfText' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='58' name='Text' type='STRING' />");
-            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
-            xml.AppendLine("    <field number='200' name='FooNest' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='201' name='FooDelim' type='STRING' />");
-            xml.AppendLine("    <field number='202' name='FooField' type='STRING' />");
-            xml.AppendLine("    <field number='300' name='BarNest' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='301' name='BarDelim' type='STRING' />");
-            xml.AppendLine("    <field number='302' name='BarField' type='STRING' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
+            var nestedGroupMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(nestedGroupMessage, ParserTask.Messages);
+            Assert.Single(dd.Messages);
 
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
-            Assert.AreEqual(1, dd.Messages.Count);
+            var linesOfText = (DDGroup)dd.Messages["B"].Elements[33];
+            Assert.Equal(3, linesOfText.Elements.Count);
+            Assert.Equal(new int[] { 58, 200, 300 }, linesOfText.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 58, 300 }, linesOfText.RequiredElements.OrderBy(x => x).ToArray());
 
-            var linesOfText = (DDTool.Structures.DDGroup)dd.Messages["B"].Elements[33];
-            Assert.AreEqual(3, linesOfText.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 58, 200, 300 }, linesOfText.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 58, 300 }, linesOfText.RequiredElements.OrderBy(x => x).ToArray());
+            var fooNest = (DDGroup)linesOfText.Elements[200];
+            Assert.Equal(200, fooNest.CounterField.Tag);
+            Assert.Equal(201, fooNest.Delimiter.Tag);
+            Assert.Equal(new int[] { 201, 202 }, fooNest.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 201, 202 }, fooNest.RequiredElements.OrderBy(x => x).ToArray());
 
-            var fooNest = (DDTool.Structures.DDGroup)linesOfText.Elements[200];
-            Assert.AreEqual(200, fooNest.CounterField.Tag);
-            Assert.AreEqual(201, fooNest.Delimiter.Tag);
-            CollectionAssert.AreEqual(new int[] { 201, 202 }, fooNest.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 201, 202 }, fooNest.RequiredElements.OrderBy(x => x).ToArray());
-
-            var barNest = (DDTool.Structures.DDGroup)linesOfText.Elements[300];
-            Assert.AreEqual(300, barNest.CounterField.Tag);
-            Assert.AreEqual(301, barNest.Delimiter.Tag);
-            CollectionAssert.AreEqual(new int[] { 301, 302 }, barNest.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 301 }, barNest.RequiredElements.OrderBy(x => x).ToArray());
-            Assert.AreEqual(1, barNest.RequiredElements.Count);
+            var barNest = (DDGroup)linesOfText.Elements[300];
+            Assert.Equal(300, barNest.CounterField.Tag);
+            Assert.Equal(301, barNest.Delimiter.Tag);
+            Assert.Equal(new int[] { 301, 302 }, barNest.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 301 }, barNest.RequiredElements.OrderBy(x => x).ToArray());
+            Assert.Single(barNest.RequiredElements);
         }
 
-        [TestMethod]
-        public void DelimiterIsNestedGroup()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.DelimiterIsNestedGroup.txt")]
+        public async Task DelimiterIsNestedGroup(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <field name='Headline' required='Y' />");
-            xml.AppendLine("    <group name='Group11' required='Y'>");
-            xml.AppendLine("      <group name='Group12' required='N'>");
-            xml.AppendLine("        <group name='Group13' required='N'>");
-            xml.AppendLine("          <field name='Delim100' required='Y' />");
-            xml.AppendLine("          <field name='Field101' required='Y' />");
-            xml.AppendLine("        </group>");
-            xml.AppendLine("      </group>");
-            xml.AppendLine("    </group>");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
-            xml.AppendLine("    <field number='11' name='Group11' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='12' name='Group12' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='13' name='Group13' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='100' name='Delim100' type='STRING' />");
-            xml.AppendLine("    <field number='101' name='Field101' type='STRING' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
+            var delimiterNestedGroupMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(delimiterNestedGroupMessage, ParserTask.Messages);
 
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
+            var group11 = (DDGroup)dd.Messages["B"].Elements[11];
+            Assert.Single(group11.Elements);
+            Assert.Equal(12, group11.Delimiter.Tag);
 
-            var group11 = (DDTool.Structures.DDGroup)dd.Messages["B"].Elements[11];
-            Assert.AreEqual(1, group11.Elements.Count);
-            Assert.AreEqual(12, group11.Delimiter.Tag);
+            var group12 = (DDGroup)group11.Delimiter;
+            Assert.Single(group12.Elements);
+            Assert.Equal(13, group12.Delimiter.Tag);
 
-            var group12 = (DDTool.Structures.DDGroup)group11.Delimiter;
-            Assert.AreEqual(1, group12.Elements.Count);
-            Assert.AreEqual(13, group12.Delimiter.Tag);
-
-            var group13 = (DDTool.Structures.DDGroup)group12.Delimiter;
-            Assert.AreEqual(2, group13.Elements.Count);
-            Assert.AreEqual(100, group13.Delimiter.Tag);
+            var group13 = (DDGroup)group12.Delimiter;
+            Assert.Equal(2, group13.Elements.Count);
+            Assert.Equal(100, group13.Delimiter.Tag);
         }
 
-        [TestMethod]
-        public void FlatComponents()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.FlatComponents.txt")]
+        public async Task FlatComponents(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <component name='XComponent' />");
-            xml.AppendLine("    <component name='YComponent' />");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <components>");
-            xml.AppendLine("    <component name='XComponent'>");
-            xml.AppendLine("      <field name='Field66' required='Y' />");
-            xml.AppendLine("      <field name='Field67' required='N' />");
-            xml.AppendLine("    </component>");
-            xml.AppendLine("    <component name='YComponent'>");
-            xml.AppendLine("      <field name='Field77' required='N' />");
-            xml.AppendLine("      <field name='Field78' required='Y' />");
-            xml.AppendLine("    </component>");
-            xml.AppendLine("  </components>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='66' name='Field66' type='STRING' />");
-            xml.AppendLine("    <field number='67' name='Field67' type='STRING' />");
-            xml.AppendLine("    <field number='77' name='Field77' type='STRING' />");
-            xml.AppendLine("    <field number='78' name='Field78' type='STRING' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
-
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
+            var flatComponentsMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(flatComponentsMessage, ParserTask.Messages);
             var msg = dd.Messages["B"];
-            Assert.AreEqual(4, msg.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 66, 67, 77, 78 }, msg.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 66, 78 }, msg.RequiredElements.OrderBy(x => x).ToArray());
+            Assert.Equal(4, msg.Elements.Count);
+            Assert.Equal(new int[] { 66, 67, 77, 78 }, msg.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 66, 78 }, msg.RequiredElements.OrderBy(x => x).ToArray());
         }
 
-        [TestMethod]
-        public void ComponentIsGroup()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.ComponentIsGroup.txt")]
+        public async Task ComponentIsGroup(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <field name='Headline' required='Y' />");
-            xml.AppendLine("    <component name='Doots' />");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <components>");
-            xml.AppendLine("    <component name='Doots'>");
-            xml.AppendLine("      <group name='NoDoots' required='N'>");
-            xml.AppendLine("        <field name='Field66' required='Y' />");
-            xml.AppendLine("        <field name='Field67' required='N' />");
-            xml.AppendLine("      </group>");
-            xml.AppendLine("    </component>");
-            xml.AppendLine("  </components>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
-            xml.AppendLine("    <field number='900' name='NoDoots' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='66' name='Field66' type='STRING' />");
-            xml.AppendLine("    <field number='67' name='Field67' type='STRING' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
-
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
+            var componentGroupMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(componentGroupMessage, ParserTask.Messages);
             var msg = dd.Messages["B"];
-            Assert.AreEqual(2, msg.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 148, 900 }, msg.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
+            Assert.Equal(2, msg.Elements.Count);
+            Assert.Equal(new int[] { 148, 900 }, msg.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
 
-            var group = (DDTool.Structures.DDGroup)msg.Elements[900];
-            Assert.AreEqual(2, group.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 66, 67 }, group.ElementOrder.ToArray());
+            var group = (DDGroup)msg.Elements[900];
+            Assert.Equal(2, group.Elements.Count);
+            Assert.Equal(new int[] { 66, 67 }, group.ElementOrder.ToArray());
         }
 
-        [TestMethod]
-        public void ComponentContentIsGroup()
+        [Theory]
+        [InlineData("UnitTests.Resources.Messages.ComponentContentIsGroup.txt")]
+        public async Task ComponentContentIsGroup(string resourceName)
         {
-            var xml = new StringBuilder();
-            xml.AppendLine("<fix><messages>");
-            xml.AppendLine("  <message name='News' msgtype='B' msgcat='app'>");
-            xml.AppendLine("    <field name='Headline' required='Y' />");
-            xml.AppendLine("    <group name='NoDoots' required='N' >");
-            xml.AppendLine("      <component name='Doot' />");
-            xml.AppendLine("    </group>");
-            xml.AppendLine("  </message>");
-            xml.AppendLine("  <components>");
-            xml.AppendLine("    <component name='Doot'>");
-            xml.AppendLine("      <field name='Field66' required='N' />");
-            xml.AppendLine("      <field name='Field67' required='Y' />");
-            xml.AppendLine("    </component>");
-            xml.AppendLine("  </components>");
-            xml.AppendLine("  <fields>");
-            xml.AppendLine("    <field number='148' name='Headline' type='STRING' />");
-            xml.AppendLine("    <field number='900' name='NoDoots' type='NUMINGROUP' />");
-            xml.AppendLine("    <field number='66' name='Field66' type='STRING' />");
-            xml.AppendLine("    <field number='67' name='Field67' type='STRING' />");
-            xml.AppendLine("  </fields>");
-            xml.AppendLine("</messages></fix>");
-
-            var dd = ParserTestUtil.ReadDD(xml.ToString(), ParserTask.Messages);
+            var componentContentGroupMessage = await resourceName.GetResourceStringAsync<MessageParserTests>();
+            var dd = ParserTestUtil.ReadDD(componentContentGroupMessage, ParserTask.Messages);
             var msg = dd.Messages["B"];
-            Assert.AreEqual(2, msg.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 148, 900 }, msg.ElementOrder.ToArray());
-            CollectionAssert.AreEqual(new int[] { 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
+            Assert.Equal(2, msg.Elements.Count);
+            Assert.Equal(new int[] { 148, 900 }, msg.ElementOrder.ToArray());
+            Assert.Equal(new int[] { 148 }, msg.RequiredElements.OrderBy(x => x).ToArray());
 
-            var group = (DDTool.Structures.DDGroup)msg.Elements[900];
-            Assert.AreEqual(2, group.Elements.Count);
-            CollectionAssert.AreEqual(new int[] { 66, 67 }, group.ElementOrder.ToArray());
+            var group = (DDGroup)msg.Elements[900];
+            Assert.Equal(2, group.Elements.Count);
+            Assert.Equal(new int[] { 66, 67 }, group.ElementOrder.ToArray());
         }
     }
 }
