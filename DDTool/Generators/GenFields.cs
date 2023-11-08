@@ -1,8 +1,7 @@
 using System;
 
-namespace DDTool.Generators
+namespace DDTool.Generators;
+
+public class GenFields
 {
-    public class GenFields
-    {
-    }
 }

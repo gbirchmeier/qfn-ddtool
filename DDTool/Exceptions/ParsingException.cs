@@ -1,13 +1,12 @@
 using System;
 
-namespace DDTool.Exceptions
-{
-    public class ParsingException : ApplicationException
-    {
-        public ParsingException() { }
+namespace DDTool.Exceptions;
 
-        public ParsingException(string msg)
-            : base(msg)
-        { }
-    }
+public class ParsingException : ApplicationException
+{
+    public ParsingException() { }
+
+    public ParsingException(string msg)
+        : base(msg)
+    { }
 }
