@@ -6,13 +6,7 @@ namespace DDTool.Structures;
 public class DDField : IElement {
     public int Tag { get; }
     public string Name { get; }
-
-    // TODO: a custom class would read better than this Tuple
-    /// <summary>
-    /// (desc,enum) e.g. (SELL, S)
-    /// </summary>
-    public List<Tuple<string, string>> Enums { get; set; }
-
+    public List<EnumValue> Enums { get; set; }
     public string TypeFromXml { get; }
     public string CsClass { get; }
     public string BaseType { get; }
@@ -28,10 +22,10 @@ public class DDField : IElement {
     /// <param name="name"></param>
     /// <param name="enums">dictionary of enum=>description values</param>
     /// <param name="typeFromXml">the 'type' attribute from XML</param>
-    public DDField(int tag, string name, List<Tuple<string,string>> enums, string typeFromXml) {
+    public DDField(int tag, string name, List<EnumValue> enums, string typeFromXml) {
         this.Tag = tag;
         this.Name = name;
-        this.Enums = new List<Tuple<string, string>>(enums);
+        this.Enums = new List<EnumValue>(enums);
         this.TypeFromXml = typeFromXml.ToUpperInvariant();
 
         DeriveTypeInfo(typeFromXml, out string csClass, out string baseType );

@@ -114,16 +114,16 @@ public static class Program {
 
         DDField rv = flds.First(); // favor the latest Fix ver
 
-        List<Tuple<string, string>> allEnumPairs = new();
+        List<EnumValue> allEnumVals = new();
         foreach (var fld in flds) {
-            foreach (var enumm in fld.Enums) {
-                if (allEnumPairs.All(pair => pair.Item1 != enumm.Item1)) {
-                    allEnumPairs.Add(enumm);
+            foreach (var fldEnum in fld.Enums) {
+                if (allEnumVals.All(ev => ev.Desc != fldEnum.Desc)) {
+                    allEnumVals.Add(fldEnum);
                 }
             }
         }
 
-        rv.Enums = allEnumPairs;
+        rv.Enums = allEnumVals;
         return rv;
     }
 }

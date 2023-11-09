@@ -107,8 +107,8 @@ public static class GenFields {
         lines.Add("");
         lines.Add("        // Field Enumerations");
 
-        foreach (var (rawDesc, enumVal) in field.Enums) {
-            string desc = rawDesc.Replace('.', '_');
+        foreach (var enumVal in field.Enums) {
+            string desc = enumVal.Desc.Replace('.', '_');
 
             if (Regex.IsMatch(desc, @"^(\d+)(.*)")) {
                 desc = $"VAL_{desc}";
@@ -116,12 +116,12 @@ public static class GenFields {
 
             string outVal = field.BaseType switch
             {
-                "int" => enumVal,
-                "string" => $"\"{enumVal}\"",
-                "char" => $"'{enumVal}'",
-                "Boolean" => enumVal == "Y" ? "true" : "false",
+                "int" => enumVal.Val,
+                "string" => $"\"{enumVal.Val}\"",
+                "char" => $"'{enumVal.Val}'",
+                "Boolean" => enumVal.Val == "Y" ? "true" : "false",
                 _ => throw new Exception(
-                    $"unsupported field type '{field.BaseType}' ({field.Tag}/{field.Name} xmlType={field.TypeFromXml})")
+                    $"unsupported field type '{field.BaseType}' ({field})")
             };
 
             lines.Add($"        public const {field.BaseType} {desc} = {outVal};");

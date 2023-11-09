@@ -36,7 +36,7 @@ public class FieldParserTests {
         fld = dd.FieldsByTag[4];
         Assert.AreEqual("4:AdvSide:CHAR", $"{fld.Tag}:{fld.Name}:{fld.TypeFromXml}");
         Assert.AreEqual(2, fld.Enums.Count);
-        Assert.AreEqual("BUY|B", $"{fld.Enums[0].Item1}|{fld.Enums[0].Item2}");
-        Assert.AreEqual("Sell|S", $"{fld.Enums[1].Item1}|{fld.Enums[1].Item2}");
+        Assert.AreEqual("BUY|B", $"{fld.Enums[0].Desc}|{fld.Enums[0].Val}");
+        Assert.AreEqual("Sell|S", $"{fld.Enums[1].Desc}|{fld.Enums[1].Val}");
     }
 }

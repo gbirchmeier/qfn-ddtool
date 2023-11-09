@@ -18,7 +18,7 @@ public static class FieldParser {
         string name = node.Attributes["name"].Value;
         string fldType = node.Attributes["type"].Value;
         int tag = int.Parse(tagstr);
-        List<Tuple<string,string>> enums = new();
+        List<EnumValue> enums = new();
 
         if (node.HasChildNodes) {
             foreach (XmlNode enumEl in node.SelectNodes(".//value")) {
@@ -27,7 +27,7 @@ public static class FieldParser {
                 if (enumEl.Attributes["enum"] is null)
                     throw new Exception($"Node {tagstr}/{name} contains a <value> without a 'enum' attribute");
 
-                enums.Add(new Tuple<string,string>(
+                enums.Add(new EnumValue(
                     enumEl.Attributes["description"].Value,
                     enumEl.Attributes["enum"].Value));
             }
