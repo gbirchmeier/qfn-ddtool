@@ -18,7 +18,6 @@ public class Options {
         while (argList.Count > 0) {
             var next = argList.First();
             argList.RemoveFirst();
-            Console.WriteLine($">> {next}");
 
             if (next.Contains('=')) {
                 var splist = next.Split("=");

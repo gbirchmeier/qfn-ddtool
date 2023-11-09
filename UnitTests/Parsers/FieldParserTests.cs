@@ -29,14 +29,14 @@ public class FieldParserTests {
         Assert.AreEqual(dd.FieldsByTag[14], dd.FieldsByName["CumQty"]);
 
         var fld = dd.FieldsByTag[1];
-        Assert.AreEqual("1:Account:STRING", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
+        Assert.AreEqual("1:Account:STRING", $"{fld.Tag}:{fld.Name}:{fld.TypeFromXml}");
         fld = dd.FieldsByTag[14];
-        Assert.AreEqual("14:CumQty:QTY", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
+        Assert.AreEqual("14:CumQty:QTY", $"{fld.Tag}:{fld.Name}:{fld.TypeFromXml}");
 
         fld = dd.FieldsByTag[4];
-        Assert.AreEqual("4:AdvSide:CHAR", $"{fld.Tag}:{fld.Name}:{fld.FixFieldType}");
-        Assert.AreEqual(2, fld.EnumDict.Count);
-        Assert.AreEqual("BUY", fld.EnumDict["B"]);
-        Assert.AreEqual("Sell", fld.EnumDict["S"]);
+        Assert.AreEqual("4:AdvSide:CHAR", $"{fld.Tag}:{fld.Name}:{fld.TypeFromXml}");
+        Assert.AreEqual(2, fld.Enums.Count);
+        Assert.AreEqual("BUY|B", $"{fld.Enums[0].Item1}|{fld.Enums[0].Item2}");
+        Assert.AreEqual("Sell|S", $"{fld.Enums[1].Item1}|{fld.Enums[1].Item2}");
     }
 }

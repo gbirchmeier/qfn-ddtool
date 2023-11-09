@@ -16,7 +16,7 @@ public static class FieldTypeInfo {
     }
 
     public static QfnFieldClass GetQfnFieldClass(DDField field) {
-        switch (field.FixFieldType) {
+        switch (field.TypeFromXml) {
             case "CHAR":
                 return QfnFieldClass.CharField;
             case "INT":
@@ -60,7 +60,7 @@ public static class FieldTypeInfo {
                 return QfnFieldClass.StringField;
 
             default:
-                throw new FieldTypeInfoException($"Incorrect or unsupported FIX data type: {field.FixFieldType}");
+                throw new FieldTypeInfoException($"Incorrect or unsupported FIX data type: {field.TypeFromXml}");
         }
     }
 

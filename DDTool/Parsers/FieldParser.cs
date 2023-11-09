@@ -7,7 +7,7 @@ namespace DDTool.Parsers;
 
 public static class FieldParser {
     public static void ParseFields(XmlDocument doc, DataDictionary dd) {
-        XmlNodeList nodeList = doc.SelectNodes("//fields/field");
+        XmlNodeList nodeList = doc.SelectNodes("//fields/field")!;
         foreach (XmlNode fldEl in nodeList) {
             dd.AddField(CreateField(fldEl));
         }
@@ -18,14 +18,18 @@ public static class FieldParser {
         string name = node.Attributes["name"].Value;
         string fldType = node.Attributes["type"].Value;
         int tag = int.Parse(tagstr);
-        Dictionary<string, string> enums = new();
+        List<Tuple<string,string>> enums = new();
 
         if (node.HasChildNodes) {
             foreach (XmlNode enumEl in node.SelectNodes(".//value")) {
-                string description = string.Empty;
-                if (enumEl.Attributes["description"] != null)
-                    description = enumEl.Attributes["description"].Value;
-                enums[enumEl.Attributes["enum"].Value] = description;
+                if (enumEl.Attributes["description"] is null)
+                    throw new Exception($"Node {tagstr}/{name} contains a <value> without a 'description' attribute");
+                if (enumEl.Attributes["enum"] is null)
+                    throw new Exception($"Node {tagstr}/{name} contains a <value> without a 'enum' attribute");
+
+                enums.Add(new Tuple<string,string>(
+                    enumEl.Attributes["description"].Value,
+                    enumEl.Attributes["enum"].Value));
             }
         }
 

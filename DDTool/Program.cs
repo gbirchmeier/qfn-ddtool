@@ -21,7 +21,7 @@ public static class Program {
         foreach (var file in options.DDFiles)
             Console.WriteLine($"* {file}");
 
-        if (options.HasOutputDir) {
+        if (!options.HasOutputDir) {
             Console.WriteLine("No output dir was specified, so I won't generate anything.");
         } else if (!Directory.Exists(options.OutputDir)) {
             Console.WriteLine($"OutputDir does not exist: {options.OutputDir}");
@@ -37,7 +37,6 @@ public static class Program {
             List<string> ddErrors = DDTool.Validations.FieldValidator.Check(dd);
             foreach (string dde in ddErrors)
                 errors.Add($"{dd.SourceFile}: {dde}");
-            Environment.Exit(1);
         }
 
         if (errors.Count > 0) {
@@ -48,14 +47,13 @@ public static class Program {
         }
 
         if (options.HasOutputDir) {
-            var aggFields = AggregateFields(dds);
+            List<DDField> aggFields = AggregateFields(dds);
 
             Console.WriteLine("============================");
             Console.WriteLine("Writing files:");
 
-            var fieldTagsPath = Path.Join(options.OutputDir, "QuickFIXn", "Fields", "FieldTags.cs");
-            System.IO.File.WriteAllText(fieldTagsPath, DDTool.Generators.GenFieldTags.Generate(aggFields));
-            Console.WriteLine($"* Wrote {fieldTagsPath}");
+            Console.WriteLine($"* Wrote {Generators.GenFields.WriteFile(options.OutputDir, aggFields)}");
+            Console.WriteLine($"* Wrote {Generators.GenFieldTags.WriteFile(options.OutputDir, aggFields)}");
         }
     }
 
@@ -76,6 +74,11 @@ public static class Program {
         return dds;
     }
 
+    /// <summary>
+    /// Consolidate fields across all DDs into a single list
+    /// </summary>
+    /// <param name="dds"></param>
+    /// <returns></returns>
     static List<DDField> AggregateFields(List<DataDictionary> dds) {
         // This impl is a little wierd, but it mirrors the weird Ruby design
         // and produces the same output.
@@ -84,7 +87,7 @@ public static class Program {
         var rv = new List<DDField>();
 
         var fieldNames = new List<string>();
-        foreach (var dd in dds.Where(x => !x.IsFIXT).OrderBy(x => x.Identifier)) {
+        foreach (var dd in dds.OrderBy(x => x.Identifier)) {
             foreach (var name in dd.FieldsByName.Keys) {
                 if (!fieldNames.Contains(name))
                     fieldNames.Add(name);
@@ -92,18 +95,35 @@ public static class Program {
         }
 
         foreach (var name in fieldNames)
-            rv.Add(FindField(name, dds));
+            rv.Add(MergedField(name, dds));
 
         return rv;
     }
 
-    static DDField FindField(string name, List<DataDictionary> dds) {
-        DDField rv = null;
-        foreach (var dd in dds.Where(x => !x.IsFIXT).OrderByDescending(x => x.Identifier)) {
-            if (dd.FieldsByName.TryGetValue(name, out rv))
-                return rv;
+    private static DDField MergedField(string name, List<DataDictionary> dds) {
+        List<DDField> flds = new();
+
+        foreach (var dd in dds.OrderByDescending(x => x.Identifier)) {
+            if (dd.FieldsByName.TryGetValue(name, out DDField fld)) {
+                flds.Add(fld);
+            }
         }
 
-        throw new Exception($"couldn't find field: {name}");
+        if (flds.Count < 1)
+            throw new Exception($"couldn't find field: {name}"); // not likely
+
+        DDField rv = flds.First(); // favor the latest Fix ver
+
+        List<Tuple<string, string>> allEnumPairs = new();
+        foreach (var fld in flds) {
+            foreach (var enumm in fld.Enums) {
+                if (allEnumPairs.All(pair => pair.Item1 != enumm.Item1)) {
+                    allEnumPairs.Add(enumm);
+                }
+            }
+        }
+
+        rv.Enums = allEnumPairs;
+        return rv;
     }
 }
