@@ -36,6 +36,8 @@ public class DDGroup : IElement, IElementSequence {
     /// </summary>
     public List<int> ElementOrder { get; } = new();
 
+    public IEnumerable<DDGroup> Groups => Elements.Values.OfType<DDGroup>();
+
     public DDGroup(DDField counter) {
         CounterField = counter;
     }

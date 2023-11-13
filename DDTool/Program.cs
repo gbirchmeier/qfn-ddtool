@@ -32,7 +32,7 @@ public static class Program {
 
         var errors = new List<string>();
 
-        var dds = ParseDDs(options);
+        List<DataDictionary> dds = ParseDDs(options);
         foreach (DataDictionary dd in dds) {
             List<string> ddErrors = DDTool.Validations.FieldValidator.Check(dd);
             foreach (string dde in ddErrors)
@@ -54,6 +54,13 @@ public static class Program {
 
             Console.WriteLine($"* Wrote {Generators.GenFields.WriteFile(options.OutputDir, aggFields)}");
             Console.WriteLine($"* Wrote {Generators.GenFieldTags.WriteFile(options.OutputDir, aggFields)}");
+
+            List<string> factory_files = Generators.GenMessageFactories.WriteFiles(options.OutputDir, dds);
+            foreach (var ff in factory_files) {
+                Console.WriteLine($"* Wrote {ff}");
+            }
+
+            // Messages
         }
     }
 

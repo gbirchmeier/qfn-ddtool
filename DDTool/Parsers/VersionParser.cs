@@ -10,8 +10,8 @@ public static class VersionParser
 {
     public static void SetVersionInfo(XmlDocument doc, DataDictionary dd)
     {
-        dd.MajorVersion = doc.SelectSingleNode("/fix/@major").Value;
-        dd.MinorVersion = doc.SelectSingleNode("/fix/@minor").Value;
+        dd.MajorVersion = int.Parse(doc.SelectSingleNode("/fix/@major").Value);
+        dd.MinorVersion = int.Parse(doc.SelectSingleNode("/fix/@minor").Value);
 
         XmlNode node = doc.SelectSingleNode("/fix/@type");
         if (node != null)
@@ -24,7 +24,10 @@ public static class VersionParser
         }
 
         node = doc.SelectSingleNode("/fix/@servicepack");
-        if (node != null && !string.IsNullOrWhiteSpace(node.Value))
-            dd.ServicePack = node.Value;
+        if (node != null && !string.IsNullOrEmpty(node.Value)) {
+            dd.ServicePack = int.Parse(node.Value);
+            if (dd.ServicePack == 0)
+                dd.ServicePack = null;
+        }
     }
 }

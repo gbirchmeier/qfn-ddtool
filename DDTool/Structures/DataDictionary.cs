@@ -11,10 +11,10 @@ public class DataDictionary {
     /// <value></value>
     public string SourceFile { get; }
 
-    public string MajorVersion { get; set; }
-    public string MinorVersion { get; set; }
-    public string ServicePack { get; set; }
-    public bool IsFIXT { get; set; } = false;
+    public int? MajorVersion { get; set; }
+    public int? MinorVersion { get; set; }
+    public int? ServicePack { get; set; }
+    public bool IsFIXT { get; set; }
 
     public Dictionary<int, DDField> FieldsByTag { get; } = new();
     public Dictionary<string, DDField> FieldsByName { get; } = new();
@@ -28,16 +28,21 @@ public class DataDictionary {
     /// A combination of type/Major/Minor/SP.
     /// This is NOT the FIX BeginString.
     /// </summary>
-    /// <value></value>
+    /// <value>e.g. "FIX.4.2", "FIXT.1.1", "FIX.5.0.SP2"</value>
     public string Identifier
     {
         get
         {
             var prefix = IsFIXT ? "FIXT" : "FIX";
-            var svcPack = string.IsNullOrWhiteSpace(ServicePack) ? "" : $"SP{ServicePack}";
+            var svcPack = ServicePack is null ? "" : $"SP{ServicePack}";
             return $"{prefix}.{MajorVersion}.{MinorVersion}{svcPack}";
         }
     }
+
+    /// <summary>
+    /// Returns e.g. "FIX42", "FIXT11", "FIX50SP2"
+    /// </summary>
+    public string IdentifierNoDots => Identifier.Replace(".", "");
 
     public void AddField(DDField fld) {
         if (FieldsByTag.ContainsKey(fld.Tag))

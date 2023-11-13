@@ -10,5 +10,7 @@ public interface IElementSequence {
     public HashSet<int> RequiredElements { get; }
     public List<int> ElementOrder { get; }
 
+    public IEnumerable<DDGroup> Groups { get; }
+
     public void AddElement(IElement element, bool required);
 }

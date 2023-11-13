@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DDTool.Structures;
 
@@ -11,6 +12,8 @@ public class DDMessage : IElementSequence {
     public Dictionary<int, IElement> Elements { get; } = new();
     public HashSet<int> RequiredElements { get; } = new();
     public List<int> ElementOrder { get; } = new();
+
+    public IEnumerable<DDGroup> Groups => Elements.Values.OfType<DDGroup>();
 
     public DDMessage(string name, string msgType, string msgCat) {
         Name = name;
