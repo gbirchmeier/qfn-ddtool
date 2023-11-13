@@ -61,6 +61,12 @@ public static class Program {
             }
 
             // Messages
+            foreach (var dd in dds.OrderBy(x => x.Identifier)) {
+                var msgFiles = Generators.GenMessages.WriteFilesForDD(options.OutputDir, dd);
+                Console.WriteLine($"* Wrote {msgFiles.Count} message files for {dd.IdentifierNoDots}");
+                Console.WriteLine($"  From {msgFiles.First()}");
+                Console.WriteLine($"    to {msgFiles.Last()}");
+            }
         }
     }
 
