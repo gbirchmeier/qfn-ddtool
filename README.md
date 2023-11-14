@@ -1,12 +1,11 @@
-# qfn-ddtool
+# DDTool
 DataDictionary analyzer/codegen for QuickFIX/n
 
+It doesn't do much analyzing yet.
 
-## In development - Not intended for use yet
-
-Feel free to look around, but this is in early development.
-
-When it's worth something, I'll announce it on the [QuickFIX/n mailing list](http://quickfixn.org/help/).
+It intentionally has minimal dependencies, and the UTs use
+Microsoft's default TestFramework
+(which isn't great, but good enough for this).
 
 ## To run
 
