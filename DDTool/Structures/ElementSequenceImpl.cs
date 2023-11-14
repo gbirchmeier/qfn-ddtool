@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DDTool.Exceptions;
 
 namespace DDTool.Structures;
@@ -13,8 +14,19 @@ public static class ElementSequenceImpl {
             throw new ParsingException($"Tag {element.Tag} appears twice in {seq.Name}");
 
         seq.Elements[element.Tag] = element;
-        seq.ElementOrder.Add(element.Tag);
+        seq.TagOrder.Add(element.Tag);
         if (required)
-            seq.RequiredElements.Add(element.Tag);
+            seq.RequiredTags.Add(element.Tag);
+    }
+
+    public static List<DDField> RequiredFields(IElementSequence seq) {
+        List<DDField> rv = new List<DDField>();
+        foreach (var reqTag in seq.RequiredTags) {
+            var el = seq.Elements[reqTag];
+            if (el is DDField field)
+                rv.Add(field);
+        }
+
+        return rv;
     }
 }

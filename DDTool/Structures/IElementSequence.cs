@@ -7,8 +7,10 @@ public interface IElementSequence {
     public string Name { get; }
 
     public Dictionary<int, IElement> Elements { get; }
-    public HashSet<int> RequiredElements { get; }
-    public List<int> ElementOrder { get; }
+    public HashSet<int> RequiredTags { get; }
+    public List<int> TagOrder { get; }
+
+    public List<DDField> RequiredFields { get; }
 
     public IEnumerable<DDGroup> Groups { get; }
 

@@ -15,9 +15,9 @@ public class DDGroup : IElement, IElementSequence {
     {
         get
         {
-            if (ElementOrder.Count < 1)
+            if (TagOrder.Count < 1)
                 throw new InvalidDataException($"Group {Name}/{Tag} has no elements");
-            return Elements[ElementOrder.First()];
+            return Elements[TagOrder.First()];
         }
     }
 
@@ -29,12 +29,14 @@ public class DDGroup : IElement, IElementSequence {
     /// <summary>
     /// Includes delimiter
     /// </summary>
-    public HashSet<int> RequiredElements { get; } = new();
+    public HashSet<int> RequiredTags { get; } = new();
 
     /// <summary>
     /// Includes delimiter (which is always first)
     /// </summary>
-    public List<int> ElementOrder { get; } = new();
+    public List<int> TagOrder { get; } = new();
+
+    public List<DDField> RequiredFields => ElementSequenceImpl.RequiredFields(this);
 
     public IEnumerable<DDGroup> Groups => Elements.Values.OfType<DDGroup>();
 

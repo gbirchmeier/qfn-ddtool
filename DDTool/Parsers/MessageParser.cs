@@ -43,18 +43,16 @@ public static class MessageParser {
     }
 
     private static void ReadChildNode(
-        XmlNode childNode, IElementSequence elSeq, DataDictionary dd, XmlDocument doc) {
+        XmlNode childNode, IElementSequence elSeq, DataDictionary dd, XmlDocument doc, bool overrideReq = false) {
+        bool req = childNode.Attributes["required"]?.Value == "Y" && !overrideReq;
+
         switch (childNode.Name.ToLowerInvariant()) {
             case "field":
-                elSeq.AddElement(
-                    dd.LookupField(childNode.Attributes["name"].Value),
-                    childNode.Attributes["required"]?.Value == "Y");
+                elSeq.AddElement(dd.LookupField(childNode.Attributes["name"].Value), req);
                 break;
 
             case "group":
-                elSeq.AddElement(
-                    CreateGroup(childNode, dd, doc),
-                    childNode.Attributes["required"]?.Value == "Y");
+                elSeq.AddElement(CreateGroup(childNode, dd, doc), req);
                 break;
 
             case "component":
@@ -65,7 +63,7 @@ public static class MessageParser {
                     throw new ParsingException($"Can't find component: {componentName}");
 
                 foreach (XmlNode innerCompNode in compNode.ChildNodes)
-                    ReadChildNode(innerCompNode, elSeq, dd, doc);
+                    ReadChildNode(innerCompNode, elSeq, dd, doc, !req);
 
                 break;
 
